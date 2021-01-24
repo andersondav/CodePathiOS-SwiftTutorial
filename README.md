@@ -1,6 +1,7 @@
 # CodePathiOS-SwiftTutorial
 
-## Intro to the basics of Swift for Purdue University's CodePath iOS Course.
+## Description
+Intro to the basics of Swift for Purdue University's CodePath iOS Course.
 
 ## Topics
 1. Declaring Variables
