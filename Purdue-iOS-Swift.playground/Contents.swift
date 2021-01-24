@@ -8,7 +8,7 @@ import Foundation
     // Two Options: var vs. let
     var myVar = "myVar"
     let myLet = "myLet"
-    
+
     // "let" variables are constants
     // myLet = "newVal" <-- Not allowed
 
@@ -88,19 +88,19 @@ import Foundation
         var property1: Int
         var property2: String
         var property3: Float
-        
+
         // Initializer
         init(property1: Int, property2: String, property3: Float) {
             self.property1 = property1
             self.property2 = property2
             self.property3 = property3
         }
-        
+
         // Instance method; called on an instance of myClass
         func printProperties() {
             print("Prop1: \(self.property1), Prop2: \(self.property2), Prop3: \(self.property3)")
         }
-        
+
         // class func; doesn't belong to a specific instance
         class func myClassFunc() {
             print("Hello from myClass!")
@@ -117,7 +117,7 @@ import Foundation
         var structProp1: Int
         var structProp2: String
         var structProp3: Float
-        
+
         // standard initializer automatically created--no need to write one
     }
 
@@ -144,7 +144,7 @@ import Foundation
 // 6. Optionals
     // Optionals are one of the most unique features of Swift
     // They are Swift's way to handle the possibility of receiving a null (called nil in Swift) value
-    
+
     // Normal variables can't hold nil
     // var myString: String = nil <-- illegal
 
@@ -191,9 +191,9 @@ import Foundation
             print("The value was nil")
             return
         }
-        
+
         // print(contents) <-- with if-let, we can't access contents outside of the if statement
-        
+
         // Option 3.2: Guard-let
         guard let contents2 = arg else {
             // we unwrap the optional into "contents2"
@@ -201,7 +201,7 @@ import Foundation
             print("The value was nil")
             return
         }
-        
+
         printString(arg: contents2) // <-- with guard-let, we have full access to unwrapped string contents2 after the guard statement
     }
 
@@ -213,3 +213,78 @@ import Foundation
 
     // Unwrapping the optional is particularly useful for situations like parsing network calls, where we don't know if we received a valid response in some variables.
     // It allows us to easily define how we want to handle cases when a variable has a nil value.
+
+// 7. Advanced Topic - Protocols and Delegates
+    // As you begin developing apps, you may see/hear the terms "protocol" and "delegate" thrown around.
+    // These are essentially "blueprints" that define what variables/functions classes that implement them need to have.
+
+    // For example, one such instance you might run into is the term "UITableViewDelegate"
+    // In particular, you may wonder what this means, and this section serves to simplify what that means.
+
+    // In the most basic sense, a protocol is a set of requirements.
+    // For example, we define the GameDelegate protocol below:
+    protocol GameDelegate: AnyObject {
+        func gameDidStart()
+        func verifyWin() -> Bool
+        func gameDidEnd()
+    }
+    // The 3 function signatures in this protocol define the three responsbilities any instance of a GameDelegate needs to have
+    // In particular, a game delegate needs to be able to set up the game when it starts, verify if a player has won the game, and shut down the game when it ends
+
+    // Next, we'll define a game of tic-tac-toe that utilizes a GameDelegate
+    class TicTacToe {
+        weak var delegate: GameDelegate?
+        func play() {
+            delegate?.gameDidStart()
+            
+            while delegate?.verifyWin() != true {
+                print("Playing turn")
+            }
+            
+            delegate?.gameDidEnd()
+        }
+    }
+
+    // We'll now declare our TicTacToeTracker to delegate tasks for Tic-Tac-Toe
+    class TicTacToeTracker: GameDelegate {
+        var curPlayer: String = ""
+        
+        func gameDidStart() {
+            self.curPlayer = "X"
+            print("Starting Tic-Tac-Toe")
+            
+        }
+        
+        func verifyWin() -> Bool {
+            // Dummy code to "verify" if a player has won the game
+            let int = Int.random(in: 0..<5)
+            if int != 4 && int != 3 {
+                print("No one won yet!")
+                return false
+            }
+            else if int == 3 {
+                print("Player 1 won!")
+                return true
+            }
+            else {
+                print("Player 2 won!")
+                return true
+            }
+        }
+        
+        func gameDidEnd() {
+            print("Game over")
+        }
+
+    }
+    // With this setup, the TicTacToe class sends all handling of the game to the TicTacToeTracker
+    // In other words, the TicTacToe class "delegates" the responsibility of handling the game to the TicTacToeTracker
+    // All the TicTacToe class has to do is implement the play method, and the TicTacToeTracker handles the rest
+
+    let myGame = TicTacToe()
+    let myTracker = TicTacToeTracker()
+    
+    myGame.delegate = myTracker
+    myGame.play()
+    // It's not too important as a beginner to know how to code protocols and delegates directly. Most importantly, knowing generally how they work and what they're used for will help you to understand potential obstacles you may run into.
+    // For example, we could replace the GameDelegate protocol with the TableViewDelegate and the TicTacToe class with a TableView class. Then, all we need to do is make sure that we implement the required methods for a TableViewDelegate, and provide it to the TableView. This allows the TableView to "delegate" its tasks to the delegate, similar to how the TicTacToe class delegates tasks to the GameDelegate.
